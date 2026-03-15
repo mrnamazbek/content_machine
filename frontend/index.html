@@ -183,6 +183,20 @@
         button:active {
             transform: scale(0.95);
         }
+        
+        button.btn-primary {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(79, 172, 254, 0.2));
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+            grid-column: 1 / -1; /* spans full width */
+            font-size: 1.2rem;
+            padding: 1.2rem;
+        }
+        
+        button.btn-primary:hover {
+            box-shadow: 0 0 25px rgba(0, 242, 254, 0.5);
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.3), rgba(79, 172, 254, 0.3));
+        }
 
         /* Output Logs */
         .logs-container {
@@ -268,6 +282,10 @@
         <!-- Manual Triggers -->
         <h2><i data-lucide="zap"></i> Manual Triggers</h2>
         <div class="actions-grid">
+            <button class="btn-primary" onclick="runPipeline(this)">
+                <i data-lucide="play-circle"></i>
+                Run Full Pipeline (Auto)
+            </button>
             <button onclick="triggerApi('/trigger/discover', {}, this)">
                 <i data-lucide="compass"></i>
                 Discover Trends
@@ -365,6 +383,49 @@
                 btnElement.innerHTML = originalHTML;
                 lucide.createIcons();
             }
+        }
+        
+        // SSE for Full Pipeline Run
+        function runPipeline(btnElement) {
+            const originalHTML = btnElement.innerHTML;
+            btnElement.classList.add('btn-loading');
+            btnElement.innerHTML = '<i data-lucide="loader-2"></i> Pipeline Running...';
+            btnElement.disabled = true; // prevent double clicks
+            lucide.createIcons();
+
+            addLog(`Connecting to Pipeline Engine...`, 'info');
+            
+            // Initiate Server-Sent Events connection
+            const eventSource = new EventSource('/trigger/run-pipeline?limit=3&platform=tiktok');
+
+            eventSource.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                
+                if (data.includes("ERROR")) {
+                    addLog(data, 'error');
+                } else if (data.includes("COMPLETE")) {
+                    addLog(data, 'success');
+                    eventSource.close();
+                    btnElement.classList.remove('btn-loading');
+                    btnElement.innerHTML = originalHTML;
+                    btnElement.disabled = false;
+                    lucide.createIcons();
+                    fetchStatus();
+                } else {
+                    addLog(data, 'info');
+                    fetchStatus(); // refresh counts during run
+                }
+            };
+
+            eventSource.onerror = function(err) {
+                addLog(`Connection to Pipeline lost.`, 'error');
+                eventSource.close();
+                btnElement.classList.remove('btn-loading');
+                btnElement.innerHTML = originalHTML;
+                btnElement.disabled = false;
+                lucide.createIcons();
+                fetchStatus();
+            };
         }
 
         // Auto-refresh status every 10 seconds

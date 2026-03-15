@@ -5,6 +5,8 @@ Exposes endpoints for n8n workflow triggers.
 
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from fastapi.responses import FileResponse
+from sse_starlette.sse import EventSourceResponse
+import asyncio
 from pydantic import BaseModel
 from typing import Optional
 from loguru import logger
@@ -71,6 +73,14 @@ class AnalyzeRequest(BaseModel):
     days: int = 7
     provider: str = "openai"
 
+
+class RunPipelineRequest(BaseModel):
+    limit: int = 3
+    platform: str = "tiktok"
+
+
+# ── State Machine (Idempotency) ───────────────────
+_pipeline_running = False
 
 # ── Pipeline Endpoints ────────────────────────────
 
@@ -225,3 +235,81 @@ def pipeline_status():
         "pipeline_status": statuses,
         "total_videos": sum(statuses.values()),
     }
+
+
+@app.get("/trigger/run-pipeline")
+async def trigger_run_pipeline(limit: int = 3, platform: str = "tiktok"):
+    """
+    Run the full content pipeline end-to-end via Server-Sent Events (SSE).
+    Idempotent: prevents concurrent runs.
+    """
+    global _pipeline_running
+    
+    if _pipeline_running:
+        async def _conflict():
+            yield {"data": "ERROR: Pipeline is already running! Please wait for it to finish."}
+        return EventSourceResponse(_conflict())
+        
+    async def event_generator():
+        global _pipeline_running
+        _pipeline_running = True
+        try:
+            # Yield initial connect
+            yield {"data": "=== AI Content Machine Pipeline Started ==="}
+            await asyncio.sleep(0.5)
+
+            # Deferred heavy imports to avoid blocking
+            from scrapers.discover_trends import TrendDiscoverer
+            from scrapers.find_videos import VideoFinder
+            from scrapers.download import VideoDownloader
+            from processing.edit_video import VideoProcessor
+            from ai.generate_caption import CaptionGenerator
+
+            # 1. Discover
+            yield {"data": "[1/5] Discovering trends..."}
+            discoverer = TrendDiscoverer()
+            trends = discoverer.discover_all()
+            yield {"data": f"  -> Found trends for {len(trends)} niches"}
+            await asyncio.sleep(0.1)
+
+            # 2. Find
+            yield {"data": "[2/5] Finding viral videos..."}
+            finder = VideoFinder()
+            total_found = 0
+            for trend in trends:
+                for topic in trend.get("topic_ideas", [])[:2]:
+                    ids = finder.discover_and_save(query=topic, niche=trend["niche"])
+                    total_found += len(ids)
+            yield {"data": f"  -> Found {total_found} new videos"}
+            await asyncio.sleep(0.1)
+
+            # 3. Download
+            yield {"data": "[3/5] Downloading videos..."}
+            downloader = VideoDownloader()
+            downloaded = downloader.download_batch(limit=limit)
+            yield {"data": f"  -> Downloaded {len(downloaded)} videos"}
+            await asyncio.sleep(0.1)
+
+            # 4. Process
+            yield {"data": "[4/5] Processing videos with FFmpeg..."}
+            processor = VideoProcessor()
+            processed = processor.process_batch(limit=limit)
+            yield {"data": f"  -> Processed {len(processed)} videos"}
+            await asyncio.sleep(0.1)
+
+            # 5. Captions
+            yield {"data": "[5/5] Generating AI Captions..."}
+            generator = CaptionGenerator()
+            captions = generator.generate_batch(limit=limit)
+            yield {"data": f"  -> Generated {len(captions)} captions"}
+            await asyncio.sleep(0.1)
+
+            yield {"data": f"=== PIPELINE COMPLETE! {len(captions)} videos ready ==="}
+            
+        except Exception as e:
+            logger.error(f"Pipeline crashed: {e}")
+            yield {"data": f"ERROR: Pipeline failed halfway: {str(e)}"}
+        finally:
+            _pipeline_running = False
+
+    return EventSourceResponse(event_generator())
