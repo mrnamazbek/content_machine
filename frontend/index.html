@@ -197,6 +197,71 @@
             box-shadow: 0 0 25px rgba(0, 242, 254, 0.5);
             background: linear-gradient(135deg, rgba(0, 242, 254, 0.3), rgba(79, 172, 254, 0.3));
         }
+        
+        /* Content Library Cards */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        .content-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            transition: transform 0.3s ease;
+        }
+        .content-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--glass-highlight);
+        }
+        .content-card video {
+            width: 100%;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.5);
+            max-height: 400px;
+            object-fit: contain;
+        }
+        .content-card h3 {
+            font-size: 1.1rem;
+            text-transform: capitalize;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+        .caption-box {
+            background: rgba(0,0,0,0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            white-space: pre-wrap;
+            flex-grow: 1;
+        }
+        .copy-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+            flex-direction: row;
+        }
+        .copy-btn:hover {
+            background: rgba(46, 204, 113, 0.2);
+            border-color: var(--success);
+            color: var(--success);
+        }
+        .copy-btn:hover i { transform: scale(1.1); }
 
         /* Output Logs */
         .logs-container {
@@ -310,6 +375,19 @@
                 <i data-lucide="upload"></i>
                 Upload TikTok
             </button>
+        </div>
+
+        <!-- Content Library Preview -->
+        <h2 style="display: flex; justify-content: space-between; align-items: center; margin-top: 3rem;">
+            <div style="display:flex; align-items:center; gap: 10px;">
+                <i data-lucide="library"></i> Content Library
+            </div>
+            <button class="copy-btn" onclick="fetchLibrary()" style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.8rem; margin: 0;">
+                <i data-lucide="refresh-cw" style="width:16px; height:16px; color:#fff;"></i> Refresh
+            </button>
+        </h2>
+        <div class="content-grid" id="content-grid" style="margin-bottom: 2rem;">
+            <p style="color:var(--text-muted)">Loading generated content...</p>
         </div>
 
         <!-- Terminal Logs -->
@@ -428,8 +506,48 @@
             };
         }
 
+        async function fetchLibrary() {
+            try {
+                const res = await fetch('/api/content/ready');
+                const data = await res.json();
+                const grid = document.getElementById('content-grid');
+                grid.innerHTML = '';
+                
+                if(!data.data || data.data.length === 0) {
+                    grid.innerHTML = '<p style="color:var(--text-muted)">No videos ready yet. Run the pipeline to generate content!</p>';
+                    return;
+                }
+                
+                data.data.forEach(item => {
+                    const videoUrl = '/' + (item.local_path_processed || item.local_path_raw || '');
+                    let hashtagsStr = Array.isArray(item.hashtags) ? item.hashtags.join(' ') : (item.hashtags || '');
+                    
+                    const card = document.createElement('div');
+                    card.className = 'content-card';
+                    
+                    const fullText = item.caption + '\\n\\n' + hashtagsStr;
+                    const safeText = fullText.replace(/'/g, "\\'").replace(/\\n/g, "\\\\n").replace(/\\/g, "\\\\");
+                    
+                    card.innerHTML = `
+                        <h3>${item.niche || 'Trending'} Topic</h3>
+                        <video src="${videoUrl}" controls playsinline preload="metadata"></video>
+                        <div class="caption-box">${item.caption}<br><br><span style="color:var(--accent)">${hashtagsStr}</span></div>
+                        <button class="copy-btn" onclick="navigator.clipboard.writeText('${safeText}'); addLog('Copied caption to clipboard!', 'success');">
+                           <i data-lucide="copy" style="width:18px; height:18px;"></i> Copy Caption & Tags
+                        </button>
+                    `;
+                    grid.appendChild(card);
+                });
+                lucide.createIcons();
+            } catch (err) {
+                console.error("Failed to load library", err);
+                document.getElementById('content-grid').innerHTML = '<p style="color:var(--error)">Failed to load content.</p>';
+            }
+        }
+
         // Auto-refresh status every 10 seconds
         fetchStatus();
+        fetchLibrary();
         setInterval(fetchStatus, 10000);
     </script>
 </body>

@@ -5,8 +5,10 @@ Exposes endpoints for n8n workflow triggers.
 
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from sse_starlette.sse import EventSourceResponse
 import asyncio
+import os
 from pydantic import BaseModel
 from typing import Optional
 from loguru import logger
@@ -14,11 +16,15 @@ from loguru import logger
 from config.settings import settings
 from database.db import db
 
+os.makedirs("videos", exist_ok=True)
+
 app = FastAPI(
     title="AI Content Machine",
     description="Automated content pipeline API for n8n integration",
     version="1.0.0",
 )
+
+app.mount("/videos", StaticFiles(directory="videos"), name="videos")
 
 
 # ── Startup / Shutdown ────────────────────────────
@@ -235,6 +241,13 @@ def pipeline_status():
         "pipeline_status": statuses,
         "total_videos": sum(statuses.values()),
     }
+
+
+@app.get("/api/content/ready")
+def get_ready_content(limit: int = 15):
+    """Get videos and their captions that are ready to be posted manually."""
+    videos = db.get_ready_videos(limit=limit)
+    return {"status": "success", "data": videos}
 
 
 @app.get("/trigger/run-pipeline")

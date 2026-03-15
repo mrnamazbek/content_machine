@@ -139,6 +139,22 @@ class Database:
             row = cur.fetchone()
             return dict(row) if row else None
 
+    def get_ready_videos(self, limit: int = 20) -> List[Dict]:
+        """Get videos that are ready for manual posting with their generated captions."""
+        with self.get_cursor(commit=False) as cur:
+            cur.execute(
+                """SELECT DISTINCT ON (v.id) 
+                          v.id, v.title, v.source_url, v.local_path_processed, v.local_path_raw, v.niche,
+                          c.caption, c.hashtags, c.created_at as caption_date
+                   FROM videos v
+                   JOIN captions c ON v.id = c.video_id
+                   WHERE v.status = 'captioned' Or v.status = 'processed' 
+                   ORDER BY v.id, c.created_at DESC
+                   LIMIT %s""",
+                (limit,)
+            )
+            return [dict(row) for row in cur.fetchall()]
+
     # ── Captions ──────────────────────────────────
 
     def save_caption(self, video_id: int, caption: str, hashtags: list,

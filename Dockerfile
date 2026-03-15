@@ -2,6 +2,11 @@ FROM python:3.11-slim
 
 # System dependencies: FFmpeg, yt-dlp prerequisites, Playwright browser deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    g++ \
+    python3-dev \
+    libpq-dev \
     ffmpeg \
     curl \
     wget \
