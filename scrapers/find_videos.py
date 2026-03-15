@@ -31,9 +31,10 @@ class VideoFinder:
         }
 
         prefix = search_prefix.get(platform, "ytsearch")
-        search_query = f"{prefix}{max_results}:{query} shorts"
+        # Enhance query to heavily bias towards YouTube Shorts
+        search_query = f"{prefix}{max_results * 2}:\"{query}\" #shorts"
 
-        logger.info(f"Searching videos: platform={platform}, query='{query}'")
+        logger.info(f"Searching videos: platform={platform}, query='{search_query}'")
 
         try:
             result = subprocess.run(
@@ -88,17 +89,32 @@ class VideoFinder:
         """Filter videos by views, duration, and deduplication."""
         filtered = []
         for v in videos:
-            # Check minimum views
-            if v["original_views"] < self.min_views:
-                logger.debug(f"Skipping (low views={v['original_views']}): {v['title'][:50]}")
-                continue
-
-            # Check max duration
-            if v["duration"] > self.max_duration:
+            # 1. Check max duration
+            # yt-dlp sometimes fails to get duration (returns 0). We should only skip if it's explicitly strictly greater.
+            if v["duration"] > 0 and v["duration"] > self.max_duration:
                 logger.debug(f"Skipping (too long={v['duration']}s): {v['title'][:50]}")
                 continue
 
+            # 2. Check minimum views
+            # yt-dlp flat-playlist often misses view_count (returns 0 or very small numbers like '5' for live streams).
+            # We relax the strict filter if the view count wasn't successfully scraped to avoid dropping viral shorts.
+            if v["original_views"] > 0 and v["original_views"] < self.min_views:
+                 # Soft fallback: if it's a short, we might still accept it if view parsing failed
+                 if v["original_views"] > 1000: # If it actually parsed a real number > 1000 but < min_views
+                     logger.debug(f"Skipping (low views={v['original_views']}): {v['title'][:50]}")
+                     continue
+
+            # Prevent extremely long titles that might be compilations
+            if len(v["title"]) > 150:
+                 continue
+
             filtered.append(v)
+
+        # Sort by views (descending) to get the best ones, treating 0 as unknown (potentially high)
+        filtered.sort(key=lambda x: x["original_views"] if x["original_views"] > 1000 else float('inf'), reverse=True)
+        
+        # Limit to the actual requested amount, since we doubled the yt-dlp search scope
+        filtered = filtered[:10]
 
         logger.info(f"Filtered {len(filtered)}/{len(videos)} videos passed criteria")
         return filtered

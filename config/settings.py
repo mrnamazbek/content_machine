@@ -31,8 +31,8 @@ class Settings(BaseSettings):
 
     # ── Content Settings ──────────────────────────
     niches: str = "gym discipline,engineer life,coding mindset,football motivation"
-    min_views: int = 500_000
-    max_duration: int = 30
+    min_views: int = 50_000
+    max_duration: int = 60
     posts_per_day: int = 5
 
     # ── TikTok Auth ───────────────────────────────
