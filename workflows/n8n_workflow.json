@@ -1,0 +1,356 @@
+{
+  "name": "AI Content Machine Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 6
+            }
+          ]
+        }
+      },
+      "id": "cron-trigger",
+      "name": "Every 6 Hours",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://app:8000/trigger/discover",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": []
+        },
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "discover-trends",
+      "name": "1. Discover Trends",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://app:8000/trigger/find",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"limit\": 10}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "find-videos",
+      "name": "2. Find Videos",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://app:8000/trigger/download",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"limit\": 5}",
+        "options": {
+          "timeout": 600000
+        }
+      },
+      "id": "download-videos",
+      "name": "3. Download Videos",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://app:8000/trigger/process",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"limit\": 5}",
+        "options": {
+          "timeout": 600000
+        }
+      },
+      "id": "process-videos",
+      "name": "4. Process Videos",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://app:8000/trigger/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"limit\": 5}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "generate-captions",
+      "name": "5. Generate Captions",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1340, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://app:8000/trigger/upload",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"platform\": \"tiktok\", \"limit\": 3}",
+        "options": {
+          "timeout": 300000
+        }
+      },
+      "id": "upload-tiktok",
+      "name": "6a. Upload TikTok",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1560, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://app:8000/trigger/upload",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"platform\": \"instagram\", \"limit\": 3}",
+        "options": {
+          "timeout": 300000
+        }
+      },
+      "id": "upload-instagram",
+      "name": "6b. Upload Instagram",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1560, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://app:8000/trigger/analytics",
+        "options": {
+          "timeout": 300000
+        }
+      },
+      "id": "collect-analytics",
+      "name": "7. Collect Analytics",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1780, 300]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 24
+            }
+          ]
+        }
+      },
+      "id": "daily-cron",
+      "name": "Daily Strategy",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 560]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://app:8000/trigger/optimize",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"days\": 7, \"provider\": \"openai\"}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "optimize-strategy",
+      "name": "8. AI Strategy",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 560]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://app:8000/status",
+        "options": {}
+      },
+      "id": "check-status",
+      "name": "Pipeline Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2000, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "err-check",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "completed",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "error-check",
+      "name": "Error Check",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [2000, 560]
+    }
+  ],
+  "connections": {
+    "Every 6 Hours": {
+      "main": [
+        [
+          {
+            "node": "1. Discover Trends",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1. Discover Trends": {
+      "main": [
+        [
+          {
+            "node": "2. Find Videos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2. Find Videos": {
+      "main": [
+        [
+          {
+            "node": "3. Download Videos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "3. Download Videos": {
+      "main": [
+        [
+          {
+            "node": "4. Process Videos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "4. Process Videos": {
+      "main": [
+        [
+          {
+            "node": "5. Generate Captions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "5. Generate Captions": {
+      "main": [
+        [
+          {
+            "node": "6a. Upload TikTok",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "6b. Upload Instagram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "6a. Upload TikTok": {
+      "main": [
+        [
+          {
+            "node": "7. Collect Analytics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "6b. Upload Instagram": {
+      "main": [
+        [
+          {
+            "node": "7. Collect Analytics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "7. Collect Analytics": {
+      "main": [
+        [
+          {
+            "node": "Pipeline Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Strategy": {
+      "main": [
+        [
+          {
+            "node": "8. AI Strategy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 2,
+  "updatedAt": "2026-03-15T16:00:00.000Z",
+  "versionId": "1"
+}
