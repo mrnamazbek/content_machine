@@ -36,7 +36,7 @@ class VideoDownloader:
                     "--merge-output-format", "mp4",
                     "-o", output_template,
                     "--no-playlist",
-                    "--extractor-args", "youtube:player-client=ios,web",
+                    "--extractor-args", "youtube:player_client=ios,android",
                     "--socket-timeout", "30",
                     "--retries", "3",
                     url,
