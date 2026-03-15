@@ -5,7 +5,7 @@ Uses pydantic-settings for validation and type coercion.
 
 from pydantic_settings import BaseSettings
 from pydantic import Field
-from typing import List
+from typing import List, Optional
 import os
 
 
@@ -48,6 +48,13 @@ class Settings(BaseSettings):
     video_raw_dir: str = "videos/raw"
     video_processed_dir: str = "videos/processed"
     auth_dir: str = "auth"
+
+    # ── yt-dlp / YouTube ──────────────────────────
+    # Use cookies to avoid "Sign in to confirm you're not a bot".
+    # Option 1: path to Netscape-format cookies file (export from browser or use get_cookies.txt extension).
+    ytdlp_cookies_file: Optional[str] = Field(default=None, description="Path to cookies file for yt-dlp")
+    # Option 2: use cookies from a browser (e.g. chrome, firefox, safari). Ignored if ytdlp_cookies_file is set.
+    ytdlp_cookies_from_browser: Optional[str] = Field(default=None, description="Browser name for --cookies-from-browser")
 
     class Config:
         env_file = ".env"

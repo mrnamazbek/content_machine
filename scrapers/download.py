@@ -28,19 +28,26 @@ class VideoDownloader:
 
         logger.info(f"Downloading video id={video_id}: {url}")
 
+        cmd = [
+            "yt-dlp",
+            "-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
+            "--merge-output-format", "mp4",
+            "-o", output_template,
+            "--no-playlist",
+            "--extractor-args", "youtube:player_client=ios,android",
+            "--socket-timeout", "30",
+            "--retries", "3",
+        ]
+        # Add cookies to avoid "Sign in to confirm you're not a bot"
+        if settings.ytdlp_cookies_file and os.path.isfile(settings.ytdlp_cookies_file):
+            cmd.extend(["--cookies", settings.ytdlp_cookies_file])
+        elif settings.ytdlp_cookies_from_browser:
+            cmd.extend(["--cookies-from-browser", settings.ytdlp_cookies_from_browser])
+        cmd.append(url)
+
         try:
             result = subprocess.run(
-                [
-                    "yt-dlp",
-                    "-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
-                    "--merge-output-format", "mp4",
-                    "-o", output_template,
-                    "--no-playlist",
-                    "--extractor-args", "youtube:player_client=ios,android",
-                    "--socket-timeout", "30",
-                    "--retries", "3",
-                    url,
-                ],
+                cmd,
                 capture_output=True,
                 text=True,
                 timeout=300,
