@@ -7,9 +7,11 @@ import psycopg2.pool
 import psycopg2.extras
 from contextlib import contextmanager
 from typing import Optional, List, Dict, Any
+from pathlib import Path
 from loguru import logger
 
 from config.settings import settings
+
 
 
 class Database:
@@ -36,6 +38,24 @@ class Database:
         if self._pool:
             self._pool.closeall()
             logger.info("Database connection pool closed")
+
+    def init_schema(self):
+        """Initialize database tables from schema.sql automatically."""
+        try:
+            schema_path = Path(__file__).parent / "schema.sql"
+            if not schema_path.exists():
+                logger.warning(f"Schema file not found at {schema_path}")
+                return
+            
+            with open(schema_path, "r", encoding="utf-8") as f:
+                sql = f.read()
+
+            with self.get_cursor() as cur:
+                cur.execute(sql)
+            logger.info("Database schema initialized successfully")
+        except Exception as e:
+            logger.error(f"Failed to initialize database schema: {e}")
+
 
     @contextmanager
     def get_cursor(self, commit: bool = True):
