@@ -32,10 +32,11 @@ class VideoDownloader:
             result = subprocess.run(
                 [
                     "yt-dlp",
-                    "-f", "best[height<=1920]",
+                    "-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
                     "--merge-output-format", "mp4",
                     "-o", output_template,
                     "--no-playlist",
+                    "--extractor-args", "youtube:player-client=ios,web",
                     "--socket-timeout", "30",
                     "--retries", "3",
                     url,
