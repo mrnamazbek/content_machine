@@ -4,6 +4,7 @@ Exposes endpoints for n8n workflow triggers.
 """
 
 from fastapi import FastAPI, BackgroundTasks, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import Optional
 from loguru import logger
@@ -38,6 +39,12 @@ def shutdown():
 @app.get("/health")
 def health_check():
     return {"status": "healthy", "service": "content-machine"}
+
+
+@app.get("/")
+def serve_dashboard():
+    """Serve the frontend glassmorphism dashboard."""
+    return FileResponse("frontend/index.html")
 
 
 # ── Request Models ────────────────────────────────

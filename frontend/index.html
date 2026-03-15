@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Content Machine</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-highlight: rgba(255, 255, 255, 0.2);
+            --text-main: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --accent: #00f2fe;
+            --accent-hover: #4facfe;
+            --success: #2ecc71;
+            --error: #e74c3c;
+            --bg-gradient-1: #0f2027;
+            --bg-gradient-2: #203a43;
+            --bg-gradient-3: #2c5364;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-gradient-1), var(--bg-gradient-2), var(--bg-gradient-3));
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            padding: 2rem;
+        }
+
+        /* Animated Background Orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            animation: float 20s infinite alternate cubic-bezier(0.5, 0, 0.5, 1);
+        }
+        
+        .orb-1 { width: 400px; height: 400px; background: rgba(79, 172, 254, 0.3); top: -100px; left: -100px; }
+        .orb-2 { width: 500px; height: 500px; background: rgba(0, 242, 254, 0.2); bottom: -150px; right: -100px; animation-delay: -5s; }
+        .orb-3 { width: 300px; height: 300px; background: rgba(142, 45, 226, 0.2); top: 40%; left: 50%; transform: translateX(-50%); animation-delay: -10s; }
+
+        @keyframes float {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(-50px) scale(1.1); }
+        }
+
+        /* Glassmorphism Container */
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 3rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: linear-gradient(to right, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* Dashboard Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border-color: var(--glass-highlight);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent);
+            margin: 0.5rem 0;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Actions Section */
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        button {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            padding: 1rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(4px);
+        }
+
+        button i {
+            color: var(--accent);
+            width: 24px;
+            height: 24px;
+            transition: transform 0.3s ease;
+        }
+
+        button:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+        }
+
+        button:hover i {
+            transform: scale(1.1);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        /* Output Logs */
+        .logs-container {
+            margin-top: 3rem;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: var(--success);
+        }
+        
+        .logs-container p { margin-bottom: 0.5rem; }
+        .log-error { color: var(--error); }
+        .log-info { color: #fff; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+
+        footer {
+            margin-top: 2rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        /* Loading Spinner */
+        .btn-loading i {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <!-- Background Orbs -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="container">
+        <header>
+            <h1>AI Content Machine</h1>
+            <p class="subtitle">Personal automated content pipeline</p>
+        </header>
+
+        <!-- Pipeline Status -->
+        <h2><i data-lucide="activity"></i> System Status</h2>
+        <div class="grid" id="status-grid">
+            <div class="stat-card">
+                <i data-lucide="search" style="color:var(--text-muted)"></i>
+                <div class="stat-value" id="stat-discovered">0</div>
+                <div class="stat-label">Discovered</div>
+            </div>
+            <div class="stat-card">
+                <i data-lucide="download" style="color:var(--text-muted)"></i>
+                <div class="stat-value" id="stat-downloaded">0</div>
+                <div class="stat-label">Downloaded</div>
+            </div>
+            <div class="stat-card">
+                <i data-lucide="scissors" style="color:var(--text-muted)"></i>
+                <div class="stat-value" id="stat-processed">0</div>
+                <div class="stat-label">Processed</div>
+            </div>
+            <div class="stat-card">
+                <i data-lucide="message-square" style="color:var(--text-muted)"></i>
+                <div class="stat-value" id="stat-captioned">0</div>
+                <div class="stat-label">Captioned</div>
+            </div>
+            <div class="stat-card">
+                <i data-lucide="send" style="color:var(--success)"></i>
+                <div class="stat-value" id="stat-posted">0</div>
+                <div class="stat-label">Posted</div>
+            </div>
+        </div>
+
+        <!-- Manual Triggers -->
+        <h2><i data-lucide="zap"></i> Manual Triggers</h2>
+        <div class="actions-grid">
+            <button onclick="triggerApi('/trigger/discover', {}, this)">
+                <i data-lucide="compass"></i>
+                Discover Trends
+            </button>
+            <button onclick="triggerApi('/trigger/find', {limit: 10}, this)">
+                <i data-lucide="video"></i>
+                Find Videos
+            </button>
+            <button onclick="triggerApi('/trigger/download', {limit: 5}, this)">
+                <i data-lucide="download-cloud"></i>
+                Download
+            </button>
+            <button onclick="triggerApi('/trigger/process', {limit: 5}, this)">
+                <i data-lucide="wand-2"></i>
+                Process FFmpeg
+            </button>
+            <button onclick="triggerApi('/trigger/generate', {limit: 5}, this)">
+                <i data-lucide="bot"></i>
+                AI Captions
+            </button>
+            <button onclick="triggerApi('/trigger/upload', {platform: 'tiktok', limit: 3}, this)">
+                <i data-lucide="upload"></i>
+                Upload TikTok
+            </button>
+        </div>
+
+        <!-- Terminal Logs -->
+        <div class="logs-container" id="logs">
+            <p class="log-info">> Dashboard initialized. Waiting for commands...</p>
+        </div>
+    </div>
+
+    <footer>
+        Deployed via Railway • Configured by namazbek.engineer
+    </footer>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        const logsDiv = document.getElementById('logs');
+
+        function addLog(msg, type = 'info') {
+            const time = new Date().toLocaleTimeString();
+            const p = document.createElement('p');
+            p.className = `log-${type}`;
+            p.textContent = `[${time}] > ${msg}`;
+            logsDiv.appendChild(p);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
+
+        async function fetchStatus() {
+            try {
+                const res = await fetch('/status');
+                const data = await res.json();
+                if(data.pipeline_status) {
+                    document.getElementById('stat-discovered').textContent = data.pipeline_status.discovered || 0;
+                    document.getElementById('stat-downloaded').textContent = data.pipeline_status.downloaded || 0;
+                    document.getElementById('stat-processed').textContent = data.pipeline_status.processed || 0;
+                    document.getElementById('stat-captioned').textContent = data.pipeline_status.captioned || 0;
+                    document.getElementById('stat-posted').textContent = data.pipeline_status.posted || 0;
+                }
+            } catch (err) {
+                console.error("Failed to fetch status", err);
+            }
+        }
+
+        async function triggerApi(endpoint, bodyParams, btnElement) {
+            const originalHTML = btnElement.innerHTML;
+            btnElement.classList.add('btn-loading');
+            btnElement.innerHTML = '<i data-lucide="loader-2"></i> Running...';
+            lucide.createIcons();
+            
+            addLog(`Triggering ${endpoint}...`, 'info');
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bodyParams)
+                });
+
+                const data = await response.json();
+                
+                if(response.ok) {
+                    addLog(`${endpoint} Success: ${JSON.stringify(data)}`, 'success');
+                    fetchStatus(); // refresh counters
+                } else {
+                    addLog(`Error: ${JSON.stringify(data)}`, 'error');
+                }
+            } catch (error) {
+                addLog(`Network Error: ${error.message}`, 'error');
+            } finally {
+                btnElement.classList.remove('btn-loading');
+                btnElement.innerHTML = originalHTML;
+                lucide.createIcons();
+            }
+        }
+
+        // Auto-refresh status every 10 seconds
+        fetchStatus();
+        setInterval(fetchStatus, 10000);
+    </script>
+</body>
+</html>
