@@ -71,6 +71,7 @@
             border-radius: 24px;
             padding: 3rem;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: opacity 0.4s ease, transform 0.4s ease, box-shadow 0.4s ease;
         }
 
         header {
@@ -107,7 +108,7 @@
             border-radius: 16px;
             padding: 1.5rem;
             text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease, border-color 0.3s ease, background 0.3s ease;
         }
 
         .stat-card:hover {
@@ -121,6 +122,7 @@
             font-weight: 800;
             color: var(--accent);
             margin: 0.5rem 0;
+            transition: transform 0.25s ease, color 0.25s ease;
         }
 
         .stat-label {
@@ -213,11 +215,17 @@
             display: flex;
             flex-direction: column;
             gap: 1rem;
-            transition: transform 0.3s ease;
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease, border-color 0.3s ease, opacity 0.4s ease;
+            animation: cardFadeIn 0.5s ease backwards;
         }
         .content-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-6px);
             border-color: var(--glass-highlight);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+        }
+        @keyframes cardFadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .content-card video {
             width: 100%;
@@ -263,23 +271,105 @@
         }
         .copy-btn:hover i { transform: scale(1.1); }
 
-        /* Output Logs */
-        .logs-container {
-            margin-top: 3rem;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--glass-border);
+        /* Pipeline progress (shown during run) */
+        .pipeline-progress {
+            margin: 1.5rem 0 2rem;
+            padding: 1.25rem 1.5rem;
+            background: rgba(0, 242, 254, 0.06);
+            border: 1px solid rgba(0, 242, 254, 0.25);
             border-radius: 16px;
-            padding: 1.5rem;
-            height: 200px;
-            overflow-y: auto;
-            font-family: monospace;
-            font-size: 0.9rem;
+            display: none;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .pipeline-progress.visible {
+            display: block;
+            animation: progressSlideIn 0.4s ease;
+        }
+        @keyframes progressSlideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pipeline-steps {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .pipeline-step {
+            flex: 1;
+            min-width: 80px;
+            padding: 0.5rem 0.75rem;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-align: center;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            transition: all 0.35s ease;
+        }
+        .pipeline-step.active {
+            background: rgba(0, 242, 254, 0.2);
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.3);
+        }
+        .pipeline-step.done {
+            background: rgba(46, 204, 113, 0.15);
+            border-color: var(--success);
             color: var(--success);
         }
-        
-        .logs-container p { margin-bottom: 0.5rem; }
+        .pipeline-progress-bar {
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            transition: opacity 0.3s ease;
+        }
+        .pipeline-progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Output Logs — terminal style */
+        .logs-container {
+            margin-top: 3rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.25rem 1.5rem;
+            height: 240px;
+            overflow-y: auto;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Mono', 'Consolas', monospace;
+            font-size: 0.8rem;
+            line-height: 1.5;
+            color: var(--text-main);
+            transition: height 0.3s ease, border-color 0.3s ease;
+        }
+        .logs-container.pipeline-active {
+            border-color: rgba(0, 242, 254, 0.35);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.1);
+        }
+        .log-line {
+            display: block;
+            margin-bottom: 0.35rem;
+            word-break: break-word;
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+        }
+        .log-line .log-ts { color: var(--text-muted); margin-right: 0.5rem; }
+        .log-line .log-lvl { margin-right: 0.5rem; font-weight: 700; }
+        .log-line .log-msg { color: inherit; }
+        .log-error .log-msg, .log-line.log-error { color: var(--error); }
+        .log-success .log-msg, .log-line.log-success { color: var(--success); }
+        .log-warning .log-msg, .log-line.log-warning { color: #f1c40f; }
+        .log-info .log-msg { color: rgba(255,255,255,0.9); }
+        .logs-container p { margin-bottom: 0.35rem; word-break: break-word; white-space: pre-wrap; }
         .log-error { color: var(--error); }
-        .log-info { color: #fff; }
+        .log-info { color: rgba(255,255,255,0.9); }
         
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
@@ -344,6 +434,20 @@
             </div>
         </div>
 
+        <!-- Pipeline progress (visible during full run) -->
+        <div class="pipeline-progress" id="pipeline-progress">
+            <div class="pipeline-steps">
+                <div class="pipeline-step" data-step="1">Discover</div>
+                <div class="pipeline-step" data-step="2">Find</div>
+                <div class="pipeline-step" data-step="3">Download</div>
+                <div class="pipeline-step" data-step="4">Process</div>
+                <div class="pipeline-step" data-step="5">Captions</div>
+            </div>
+            <div class="pipeline-progress-bar">
+                <div class="pipeline-progress-bar-fill" id="pipeline-progress-fill"></div>
+            </div>
+        </div>
+
         <!-- Manual Triggers -->
         <h2><i data-lucide="zap"></i> Manual Triggers</h2>
         <div class="actions-grid">
@@ -392,7 +496,7 @@
 
         <!-- Terminal Logs -->
         <div class="logs-container" id="logs">
-            <p class="log-info">> Dashboard initialized. Waiting for commands...</p>
+            <span class="log-line log-info"><span class="log-msg">&gt; Dashboard initialized. Waiting for commands...</span></span>
         </div>
     </div>
 
@@ -406,13 +510,27 @@
 
         const logsDiv = document.getElementById('logs');
 
+        // Parse log line: "2026-03-15 21:34:32.130 | INFO | scrapers.download:..." or plain message
         function addLog(msg, type = 'info') {
-            const time = new Date().toLocaleTimeString();
-            const p = document.createElement('p');
-            p.className = `log-${type}`;
-            p.textContent = `[${time}] > ${msg}`;
-            logsDiv.appendChild(p);
+            const line = document.createElement('span');
+            line.className = `log-line log-${type}`;
+            const time = new Date().toLocaleTimeString('en-GB', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const match = String(msg).match(/^(\d{4}-\d{2}-\d{2}\s+[\d.:]+)\s*\|\s*(INFO|ERROR|WARNING|DEBUG)\s*\|\s*(.*)$/);
+            if (match) {
+                const [, ts, lvl, rest] = match;
+                const lvlClass = lvl === 'ERROR' ? 'log-error' : lvl === 'WARNING' ? 'log-warning' : 'log-info';
+                line.className = `log-line ${lvlClass}`;
+                line.innerHTML = `<span class="log-ts">${ts}</span><span class="log-lvl">${lvl}</span><span class="log-msg">${escapeHtml(rest)}</span>`;
+            } else {
+                line.innerHTML = `<span class="log-ts">[${time}]</span><span class="log-msg">${escapeHtml(msg)}</span>`;
+            }
+            logsDiv.appendChild(line);
             logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
+        function escapeHtml(s) {
+            const div = document.createElement('div');
+            div.textContent = s;
+            return div.innerHTML;
         }
 
         async function fetchStatus() {
@@ -476,33 +594,60 @@
             // Initiate Server-Sent Events connection
             const eventSource = new EventSource('/trigger/run-pipeline?limit=3&platform=tiktok');
 
-            eventSource.onmessage = function(event) {
-                const data = JSON.parse(event.data);
-                
-                if (data.includes("ERROR")) {
-                    addLog(data, 'error');
-                } else if (data.includes("COMPLETE")) {
-                    addLog(data, 'success');
-                    eventSource.close();
-                    btnElement.classList.remove('btn-loading');
-                    btnElement.innerHTML = originalHTML;
-                    btnElement.disabled = false;
-                    lucide.createIcons();
-                    fetchStatus();
-                } else {
-                    addLog(data, 'info');
-                    fetchStatus(); // refresh counts during run
-                }
-            };
+            const progressEl = document.getElementById('pipeline-progress');
+            const progressFill = document.getElementById('pipeline-progress-fill');
+            const stepEls = document.querySelectorAll('.pipeline-step');
+            progressEl.classList.add('visible');
+            logsDiv.classList.add('pipeline-active');
+            progressFill.style.width = '0%';
+            stepEls.forEach(el => { el.classList.remove('active', 'done'); });
 
-            eventSource.onerror = function(err) {
-                addLog(`Connection to Pipeline lost.`, 'error');
-                eventSource.close();
+            function setStep(stepNum) {
+                stepEls.forEach((el, i) => {
+                    el.classList.remove('active', 'done');
+                    if (i + 1 < stepNum) el.classList.add('done');
+                    else if (i + 1 === stepNum) el.classList.add('active');
+                });
+                progressFill.style.width = (stepNum / 5 * 100) + '%';
+            }
+
+            function finishPipeline() {
                 btnElement.classList.remove('btn-loading');
                 btnElement.innerHTML = originalHTML;
                 btnElement.disabled = false;
                 lucide.createIcons();
+                progressEl.classList.remove('visible');
+                logsDiv.classList.remove('pipeline-active');
                 fetchStatus();
+                fetchLibrary();
+            }
+
+            eventSource.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                const stepMatch = data.match(/\[(\d)\/5\]/);
+                if (stepMatch) setStep(parseInt(stepMatch[1], 10));
+
+                if (data.includes("ERROR")) {
+                    addLog(data, 'error');
+                    eventSource.close();
+                    finishPipeline();
+                } else if (data.includes("COMPLETE") || data.includes("ready")) {
+                    addLog(data, 'success');
+                    setStep(5);
+                    stepEls.forEach(el => el.classList.add('done'));
+                    progressFill.style.width = '100%';
+                    eventSource.close();
+                    setTimeout(finishPipeline, 1200);
+                } else {
+                    addLog(data, 'info');
+                    fetchStatus();
+                }
+            };
+
+            eventSource.onerror = function() {
+                addLog('Connection to Pipeline lost.', 'error');
+                eventSource.close();
+                finishPipeline();
             };
         }
 
@@ -518,19 +663,20 @@
                     return;
                 }
                 
-                data.data.forEach(item => {
+                data.data.forEach((item, index) => {
                     const videoUrl = '/' + (item.local_path_processed || item.local_path_raw || '');
                     let hashtagsStr = Array.isArray(item.hashtags) ? item.hashtags.join(' ') : (item.hashtags || '');
                     
                     const card = document.createElement('div');
                     card.className = 'content-card';
+                    card.style.animationDelay = `${index * 0.08}s`;
                     
                     const fullText = item.caption + '\\n\\n' + hashtagsStr;
                     const safeText = fullText.replace(/'/g, "\\'").replace(/\\n/g, "\\\\n").replace(/\\/g, "\\\\");
                     
                     card.innerHTML = `
                         <h3>${item.niche || 'Trending'} Topic</h3>
-                        <video src="${videoUrl}" controls playsinline preload="metadata"></video>
+                        <video src="${videoUrl}" controls playsinline preload="metadata" autoplay muted loop></video>
                         <div class="caption-box">${item.caption}<br><br><span style="color:var(--accent)">${hashtagsStr}</span></div>
                         <button class="copy-btn" onclick="navigator.clipboard.writeText('${safeText}'); addLog('Copied caption to clipboard!', 'success');">
                            <i data-lucide="copy" style="width:18px; height:18px;"></i> Copy Caption & Tags
