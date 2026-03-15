@@ -18,8 +18,9 @@ logger.add("logs/content_machine.log", rotation="10 MB", retention="7 days",
 
 
 def init_db():
-    """Initialize database connection."""
+    """Initialize database connection and verify schema."""
     db.connect()
+    db.init_schema()
 
 
 @click.group()

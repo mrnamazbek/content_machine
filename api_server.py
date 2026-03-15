@@ -23,7 +23,8 @@ app = FastAPI(
 @app.on_event("startup")
 def startup():
     db.connect()
-    logger.info("API server started, database connected")
+    db.init_schema()
+    logger.info("API server started, database connected, schema verified")
 
 
 @app.on_event("shutdown")
