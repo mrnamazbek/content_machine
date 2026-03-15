@@ -24,11 +24,7 @@ class Database:
             self._pool = psycopg2.pool.ThreadedConnectionPool(
                 minconn=2,
                 maxconn=10,
-                host=settings.postgres_host,
-                port=settings.postgres_port,
-                dbname=settings.postgres_db,
-                user=settings.postgres_user,
-                password=settings.postgres_password,
+                dsn=settings.database_url,
             )
             logger.info("Database connection pool created")
         except psycopg2.Error as e:
