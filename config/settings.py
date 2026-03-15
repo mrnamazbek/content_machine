@@ -6,6 +6,7 @@ Uses pydantic-settings for validation and type coercion.
 from pydantic_settings import BaseSettings
 from pydantic import Field
 from typing import List
+import os
 
 
 class Settings(BaseSettings):
@@ -59,12 +60,13 @@ class Settings(BaseSettings):
 
     @property
     def database_url(self) -> str:
-        """Construct PostgreSQL connection string."""
+        """Construct PostgreSQL connection string or use exact DATABASE_URL if provided."""
+        if env_db_url := os.getenv("DATABASE_URL"):
+            return env_db_url
         return (
             f"postgresql://{self.postgres_user}:{self.postgres_password}"
             f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
         )
-
 
 # Singleton settings instance
 settings = Settings()
