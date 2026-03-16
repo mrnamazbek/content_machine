@@ -389,6 +389,26 @@
             animation: spin 1s linear infinite;
         }
         @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Mobile adaptation */
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .container { padding: 1.5rem; border-radius: 18px; }
+            header { margin-bottom: 2rem; }
+            h1 { font-size: 2rem; }
+            p.subtitle { font-size: 1rem; }
+            .grid { gap: 1rem; margin-bottom: 2rem; }
+            .actions-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+            button { padding: 0.9rem; }
+            button.btn-primary { font-size: 1.05rem; padding: 1rem; }
+            .content-grid { grid-template-columns: 1fr; }
+            .logs-container { height: 200px; padding: 1rem; }
+            .pipeline-step { min-width: 70px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { animation: none !important; transition: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -603,12 +623,16 @@
             stepEls.forEach(el => { el.classList.remove('active', 'done'); });
 
             function setStep(stepNum) {
+                const clamped = Math.max(1, Math.min(5, stepNum));
                 stepEls.forEach((el, i) => {
                     el.classList.remove('active', 'done');
-                    if (i + 1 < stepNum) el.classList.add('done');
-                    else if (i + 1 === stepNum) el.classList.add('active');
+                    if (i + 1 < clamped) el.classList.add('done');
+                    else if (i + 1 === clamped) el.classList.add('active');
                 });
-                progressFill.style.width = (stepNum / 5 * 100) + '%';
+                // Smooth update without layout thrash
+                requestAnimationFrame(() => {
+                    progressFill.style.width = (clamped / 5 * 100) + '%';
+                });
             }
 
             function finishPipeline() {
@@ -623,7 +647,8 @@
             }
 
             eventSource.onmessage = function(event) {
-                const data = JSON.parse(event.data);
+                // Server sends plain strings via SSE (not JSON)
+                const data = String(event.data || '');
                 const stepMatch = data.match(/\[(\d)\/5\]/);
                 if (stepMatch) setStep(parseInt(stepMatch[1], 10));
 
