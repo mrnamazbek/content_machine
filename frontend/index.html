@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -50,14 +51,42 @@
             z-index: -1;
             animation: float 20s infinite alternate cubic-bezier(0.5, 0, 0.5, 1);
         }
-        
-        .orb-1 { width: 400px; height: 400px; background: rgba(79, 172, 254, 0.3); top: -100px; left: -100px; }
-        .orb-2 { width: 500px; height: 500px; background: rgba(0, 242, 254, 0.2); bottom: -150px; right: -100px; animation-delay: -5s; }
-        .orb-3 { width: 300px; height: 300px; background: rgba(142, 45, 226, 0.2); top: 40%; left: 50%; transform: translateX(-50%); animation-delay: -10s; }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: rgba(79, 172, 254, 0.3);
+            top: -100px;
+            left: -100px;
+        }
+
+        .orb-2 {
+            width: 500px;
+            height: 500px;
+            background: rgba(0, 242, 254, 0.2);
+            bottom: -150px;
+            right: -100px;
+            animation-delay: -5s;
+        }
+
+        .orb-3 {
+            width: 300px;
+            height: 300px;
+            background: rgba(142, 45, 226, 0.2);
+            top: 40%;
+            left: 50%;
+            transform: translateX(-50%);
+            animation-delay: -10s;
+        }
 
         @keyframes float {
-            0% { transform: translateY(0) scale(1); }
-            100% { transform: translateY(-50px) scale(1.1); }
+            0% {
+                transform: translateY(0) scale(1);
+            }
+
+            100% {
+                transform: translateY(-50px) scale(1.1);
+            }
         }
 
         /* Glassmorphism Container */
@@ -103,7 +132,7 @@
         }
 
         .stat-card {
-            background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
             border: 1px solid var(--glass-border);
             border-radius: 16px;
             padding: 1.5rem;
@@ -173,7 +202,7 @@
         }
 
         button:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             border-color: var(--accent);
             box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
         }
@@ -185,21 +214,22 @@
         button:active {
             transform: scale(0.95);
         }
-        
+
         button.btn-primary {
             background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(79, 172, 254, 0.2));
             border-color: var(--accent);
             box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
-            grid-column: 1 / -1; /* spans full width */
+            grid-column: 1 / -1;
+            /* spans full width */
             font-size: 1.2rem;
             padding: 1.2rem;
         }
-        
+
         button.btn-primary:hover {
             box-shadow: 0 0 25px rgba(0, 242, 254, 0.5);
             background: linear-gradient(135deg, rgba(0, 242, 254, 0.3), rgba(79, 172, 254, 0.3));
         }
-        
+
         /* Content Library Cards */
         .content-grid {
             display: grid;
@@ -207,8 +237,9 @@
             gap: 1.5rem;
             margin-top: 1rem;
         }
+
         .content-card {
-            background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
             border: 1px solid var(--glass-border);
             border-radius: 16px;
             padding: 1.5rem;
@@ -218,30 +249,42 @@
             transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease, border-color 0.3s ease, opacity 0.4s ease;
             animation: cardFadeIn 0.5s ease backwards;
         }
+
         .content-card:hover {
             transform: translateY(-6px);
             border-color: var(--glass-highlight);
             box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
         }
+
         @keyframes cardFadeIn {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
+
         .content-card video {
             width: 100%;
             border-radius: 12px;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             max-height: 400px;
             object-fit: contain;
         }
+
         .content-card h3 {
             font-size: 1.1rem;
             text-transform: capitalize;
             color: var(--accent);
             margin-bottom: 0.5rem;
         }
+
         .caption-box {
-            background: rgba(0,0,0,0.3);
+            background: rgba(0, 0, 0, 0.3);
             padding: 1rem;
             border-radius: 8px;
             font-size: 0.85rem;
@@ -249,8 +292,9 @@
             white-space: pre-wrap;
             flex-grow: 1;
         }
+
         .copy-btn {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             border: 1px solid var(--glass-border);
             color: #fff;
             padding: 0.8rem 1rem;
@@ -264,12 +308,16 @@
             transition: all 0.2s;
             flex-direction: row;
         }
+
         .copy-btn:hover {
             background: rgba(46, 204, 113, 0.2);
             border-color: var(--success);
             color: var(--success);
         }
-        .copy-btn:hover i { transform: scale(1.1); }
+
+        .copy-btn:hover i {
+            transform: scale(1.1);
+        }
 
         /* Pipeline progress (shown during run) */
         .pipeline-progress {
@@ -281,20 +329,31 @@
             display: none;
             transition: opacity 0.4s ease, transform 0.4s ease;
         }
+
         .pipeline-progress.visible {
             display: block;
             animation: progressSlideIn 0.4s ease;
         }
+
         @keyframes progressSlideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
+
         .pipeline-steps {
             display: flex;
             gap: 0.5rem;
             margin-bottom: 0.75rem;
             flex-wrap: wrap;
         }
+
         .pipeline-step {
             flex: 1;
             min-width: 80px;
@@ -303,29 +362,33 @@
             font-size: 0.75rem;
             font-weight: 600;
             text-align: center;
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--glass-border);
             color: var(--text-muted);
             transition: all 0.35s ease;
         }
+
         .pipeline-step.active {
             background: rgba(0, 242, 254, 0.2);
             border-color: var(--accent);
             color: var(--accent);
             box-shadow: 0 0 12px rgba(0, 242, 254, 0.3);
         }
+
         .pipeline-step.done {
             background: rgba(46, 204, 113, 0.15);
             border-color: var(--success);
             color: var(--success);
         }
+
         .pipeline-progress-bar {
             height: 4px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 2px;
             overflow: hidden;
             transition: opacity 0.3s ease;
         }
+
         .pipeline-progress-bar-fill {
             height: 100%;
             background: linear-gradient(90deg, var(--accent), var(--accent-hover));
@@ -349,10 +412,12 @@
             color: var(--text-main);
             transition: height 0.3s ease, border-color 0.3s ease;
         }
+
         .logs-container.pipeline-active {
             border-color: rgba(0, 242, 254, 0.35);
             box-shadow: 0 0 20px rgba(0, 242, 254, 0.1);
         }
+
         .log-line {
             display: block;
             margin-bottom: 0.35rem;
@@ -360,22 +425,72 @@
             white-space: pre-wrap;
             overflow-wrap: break-word;
         }
-        .log-line .log-ts { color: var(--text-muted); margin-right: 0.5rem; }
-        .log-line .log-lvl { margin-right: 0.5rem; font-weight: 700; }
-        .log-line .log-msg { color: inherit; }
-        .log-error .log-msg, .log-line.log-error { color: var(--error); }
-        .log-success .log-msg, .log-line.log-success { color: var(--success); }
-        .log-warning .log-msg, .log-line.log-warning { color: #f1c40f; }
-        .log-info .log-msg { color: rgba(255,255,255,0.9); }
-        .logs-container p { margin-bottom: 0.35rem; word-break: break-word; white-space: pre-wrap; }
-        .log-error { color: var(--error); }
-        .log-info { color: rgba(255,255,255,0.9); }
-        
+
+        .log-line .log-ts {
+            color: var(--text-muted);
+            margin-right: 0.5rem;
+        }
+
+        .log-line .log-lvl {
+            margin-right: 0.5rem;
+            font-weight: 700;
+        }
+
+        .log-line .log-msg {
+            color: inherit;
+        }
+
+        .log-error .log-msg,
+        .log-line.log-error {
+            color: var(--error);
+        }
+
+        .log-success .log-msg,
+        .log-line.log-success {
+            color: var(--success);
+        }
+
+        .log-warning .log-msg,
+        .log-line.log-warning {
+            color: #f1c40f;
+        }
+
+        .log-info .log-msg {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .logs-container p {
+            margin-bottom: 0.35rem;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+
+        .log-error {
+            color: var(--error);
+        }
+
+        .log-info {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
 
         footer {
             margin-top: 2rem;
@@ -388,29 +503,77 @@
         .btn-loading i {
             animation: spin 1s linear infinite;
         }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
 
         /* Mobile adaptation */
         @media (max-width: 768px) {
-            body { padding: 1rem; }
-            .container { padding: 1.5rem; border-radius: 18px; }
-            header { margin-bottom: 2rem; }
-            h1 { font-size: 2rem; }
-            p.subtitle { font-size: 1rem; }
-            .grid { gap: 1rem; margin-bottom: 2rem; }
-            .actions-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
-            button { padding: 0.9rem; }
-            button.btn-primary { font-size: 1.05rem; padding: 1rem; }
-            .content-grid { grid-template-columns: 1fr; }
-            .logs-container { height: 200px; padding: 1rem; }
-            .pipeline-step { min-width: 70px; }
+            body {
+                padding: 1rem;
+            }
+
+            .container {
+                padding: 1.5rem;
+                border-radius: 18px;
+            }
+
+            header {
+                margin-bottom: 2rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            p.subtitle {
+                font-size: 1rem;
+            }
+
+            .grid {
+                gap: 1rem;
+                margin-bottom: 2rem;
+            }
+
+            .actions-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            button {
+                padding: 0.9rem;
+            }
+
+            button.btn-primary {
+                font-size: 1.05rem;
+                padding: 1rem;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .logs-container {
+                height: 200px;
+                padding: 1rem;
+            }
+
+            .pipeline-step {
+                min-width: 70px;
+            }
         }
 
         @media (prefers-reduced-motion: reduce) {
-            * { animation: none !important; transition: none !important; }
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
         }
     </style>
 </head>
+
 <body>
 
     <!-- Background Orbs -->
@@ -506,7 +669,8 @@
             <div style="display:flex; align-items:center; gap: 10px;">
                 <i data-lucide="library"></i> Content Library
             </div>
-            <button class="copy-btn" onclick="fetchLibrary()" style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.8rem; margin: 0;">
+            <button class="copy-btn" onclick="fetchLibrary()"
+                style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.8rem; margin: 0;">
                 <i data-lucide="refresh-cw" style="width:16px; height:16px; color:#fff;"></i> Refresh
             </button>
         </h2>
@@ -516,7 +680,8 @@
 
         <!-- Terminal Logs -->
         <div class="logs-container" id="logs">
-            <span class="log-line log-info"><span class="log-msg">&gt; Dashboard initialized. Waiting for commands...</span></span>
+            <span class="log-line log-info"><span class="log-msg">&gt; Dashboard initialized. Waiting for
+                    commands...</span></span>
         </div>
     </div>
 
@@ -557,7 +722,7 @@
             try {
                 const res = await fetch('/status');
                 const data = await res.json();
-                if(data.pipeline_status) {
+                if (data.pipeline_status) {
                     document.getElementById('stat-discovered').textContent = data.pipeline_status.discovered || 0;
                     document.getElementById('stat-downloaded').textContent = data.pipeline_status.downloaded || 0;
                     document.getElementById('stat-processed').textContent = data.pipeline_status.processed || 0;
@@ -574,7 +739,7 @@
             btnElement.classList.add('btn-loading');
             btnElement.innerHTML = '<i data-lucide="loader-2"></i> Running...';
             lucide.createIcons();
-            
+
             addLog(`Triggering ${endpoint}...`, 'info');
 
             try {
@@ -585,8 +750,8 @@
                 });
 
                 const data = await response.json();
-                
-                if(response.ok) {
+
+                if (response.ok) {
                     addLog(`${endpoint} Success: ${JSON.stringify(data)}`, 'success');
                     fetchStatus(); // refresh counters
                 } else {
@@ -600,7 +765,7 @@
                 lucide.createIcons();
             }
         }
-        
+
         // SSE for Full Pipeline Run
         function runPipeline(btnElement) {
             const originalHTML = btnElement.innerHTML;
@@ -610,7 +775,7 @@
             lucide.createIcons();
 
             addLog(`Connecting to Pipeline Engine...`, 'info');
-            
+
             // Initiate Server-Sent Events connection
             const eventSource = new EventSource('/trigger/run-pipeline?limit=3&platform=tiktok');
 
@@ -646,7 +811,7 @@
                 fetchLibrary();
             }
 
-            eventSource.onmessage = function(event) {
+            eventSource.onmessage = function (event) {
                 // Server sends plain strings via SSE (not JSON)
                 const data = String(event.data || '');
                 const stepMatch = data.match(/\[(\d)\/5\]/);
@@ -669,7 +834,7 @@
                 }
             };
 
-            eventSource.onerror = function() {
+            eventSource.onerror = function () {
                 addLog('Connection to Pipeline lost.', 'error');
                 eventSource.close();
                 finishPipeline();
@@ -682,23 +847,23 @@
                 const data = await res.json();
                 const grid = document.getElementById('content-grid');
                 grid.innerHTML = '';
-                
-                if(!data.data || data.data.length === 0) {
+
+                if (!data.data || data.data.length === 0) {
                     grid.innerHTML = '<p style="color:var(--text-muted)">No videos ready yet. Run the pipeline to generate content!</p>';
                     return;
                 }
-                
+
                 data.data.forEach((item, index) => {
                     const videoUrl = '/' + (item.local_path_processed || item.local_path_raw || '');
                     let hashtagsStr = Array.isArray(item.hashtags) ? item.hashtags.join(' ') : (item.hashtags || '');
-                    
+
                     const card = document.createElement('div');
                     card.className = 'content-card';
                     card.style.animationDelay = `${index * 0.08}s`;
-                    
+
                     const fullText = item.caption + '\\n\\n' + hashtagsStr;
                     const safeText = fullText.replace(/'/g, "\\'").replace(/\\n/g, "\\\\n").replace(/\\/g, "\\\\");
-                    
+
                     card.innerHTML = `
                         <h3>${item.niche || 'Trending'} Topic</h3>
                         <video src="${videoUrl}" controls playsinline preload="metadata" autoplay muted loop></video>
@@ -722,4 +887,5 @@
         setInterval(fetchStatus, 10000);
     </script>
 </body>
+
 </html>
